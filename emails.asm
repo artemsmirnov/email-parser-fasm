@@ -155,7 +155,6 @@ find_loop:
 	.p0:
 		lodsb
 		stosb
-		dec cx
 
 		xlatb
 		bt ax, 2
@@ -166,7 +165,6 @@ find_loop:
 	.p1:
 		lodsb
 		stosb
-		dec cx
 
 		xlatb
 		bt ax, 2
@@ -181,7 +179,6 @@ find_loop:
 	.p2:
 		lodsb
 		stosb
-		dec cx
 
 		xlatb
 		bt ax, 2
@@ -202,7 +199,6 @@ find_loop:
 		cmp word di, output_buffer + buffer_size - email_size
 
 		jg .skip_io
-		push cx
 		mov ah, 40h
 		mov cx, [output_buffer_ptr]
 		sub cx, output_buffer
@@ -210,9 +206,12 @@ find_loop:
 		mov bx, [output_handle]
 		int 21h
 		mov word [output_buffer_ptr], output_buffer
-		pop cx
 		mov bx, mask
 		.skip_io:
+
+		mov cx, [bytesread]
+		add cx, input_buffer
+		sub cx, si
 
 		mov di, si
 
@@ -287,6 +286,7 @@ proc load_buffer uses bx, keep
 
 	mov cx, [keep]
 	add cx, ax
+	mov [bytesread], cx
 
 	ret
 endp
@@ -300,6 +300,7 @@ finish_msg: db 'Emails: $'
 emails: dw 0
 
 timebegin: dw ?
+bytesread: dw ?
 eof: db 0
 input_filename: times 128 db 0
 output_filename: times 128 db 0
