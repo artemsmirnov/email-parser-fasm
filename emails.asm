@@ -73,6 +73,7 @@ find_loop:
 	.found_space:
 	; Подгружаем буффер
 	cld
+
 	stdcall load_buffer, cx
 	mov di, input_buffer
 
@@ -263,6 +264,7 @@ error:
 	ret
 
 proc load_buffer uses bx, keep
+	cld
 	; Копируем то что нужно оставить
 	mov di, input_buffer
 	mov si, input_buffer + buffer_size
