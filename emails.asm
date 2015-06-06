@@ -73,7 +73,6 @@ find_loop:
 	.found_space:
 	; Подгружаем буффер
 	cld
-
 	stdcall load_buffer, cx
 	mov di, input_buffer
 
@@ -192,8 +191,9 @@ find_loop:
 		dec di
 
 	.pGood:
-		mov word [di], 0D0Ah
-		inc di
+		dec di
+		mov word [di], 0A0Dh
+		add di, 2
 		mov [output_buffer_ptr], di
 		inc word [emails]
 		cmp word di, output_buffer + buffer_size - email_size
@@ -264,7 +264,6 @@ error:
 	ret
 
 proc load_buffer uses bx, keep
-	cld
 	; Копируем то что нужно оставить
 	mov di, input_buffer
 	mov si, input_buffer + buffer_size
@@ -281,8 +280,8 @@ proc load_buffer uses bx, keep
 	add dx, [keep]
 	int 21h
 
-	cmp cx, ax
-	setl [eof]
+	test cx, ax
+	setz [eof]
 
 	mov cx, [keep]
 	add cx, ax
