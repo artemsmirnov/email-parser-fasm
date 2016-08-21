@@ -48,8 +48,8 @@ find_loop:
 	.skip_maybe_end_of_file:
 
 	; Если поиск не нашел @ или нашел но скоро закончится буффер
-	cmp cx, email_size / 2
-	jge .skip_load
+	cmp cx, 20
+	ja .skip_load
 
 	cmp byte [eof], 1
 	je .skip_load
@@ -60,7 +60,7 @@ find_loop:
 	; Ищем пробел
 	.search_space:
 
-	cmp cx, email_size
+	cmp cx, 40
 	je .found_space
 
 	lodsb
@@ -196,9 +196,9 @@ find_loop:
 		add di, 2
 		mov [output_buffer_ptr], di
 		inc word [emails]
-		cmp word di, output_buffer + buffer_size - email_size
+		cmp word di, output_buffer + output_buffer_size - email_size
 
-		jg .skip_io
+		jb .skip_io
 		mov ah, 40h
 		mov cx, [output_buffer_ptr]
 		sub cx, output_buffer
@@ -264,6 +264,8 @@ error:
 	ret
 
 proc load_buffer uses bx, keep
+
+
 	; Копируем то что нужно оставить
 	mov di, input_buffer
 	mov si, input_buffer + buffer_size
@@ -309,7 +311,8 @@ output_buffer_ptr: dw ?
 
 include 'emails_mask.inc'
 
-buffer_size = 0x5000
+buffer_size = 0xC000
 email_size = 0x100
 input_buffer:
 output_buffer = input_buffer + buffer_size
+output_buffer_size = 64*1024-output_buffer
